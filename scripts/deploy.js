@@ -1,6 +1,7 @@
 /* global ethers */
 /* eslint prefer-const: "off" */
 
+const { ethers } = require('hardhat')
 const { getSelectors, FacetCutAction } = require('./libraries/diamond.js')
 
 async function deployDiamond () {
@@ -32,7 +33,8 @@ async function deployDiamond () {
   console.log('Deploying facets')
   const FacetNames = [
     'DiamondLoupeFacet',
-    'OwnershipFacet'
+    'OwnershipFacet',
+    'GetterSetter'
   ]
   const cut = []
   for (const FacetName of FacetNames) {
@@ -62,6 +64,13 @@ async function deployDiamond () {
     throw Error(`Diamond upgrade failed: ${tx.hash}`)
   }
   console.log('Completed diamond cut')
+
+//interact with GetterSetter contract
+const getterSetter =  await ethers.getContractAt("GetterSetter", diamond.address)
+const setName = await getterSetter.Setter("Dev Longs")
+const getName = await getterSetter.Getter()
+console.log(getName);
+
   return diamond.address
 }
 
